@@ -1,0 +1,92 @@
+@extends('layouts.content')
+@section('classe-body', 'register-page', 'register-page bg-body-secondary')
+@section('content')
+    <main class="register-box">
+        <h1 class="register-logo">
+            <a href="../index2.html"><b>Bem vindo</b></a>
+        </h1>
+        <!-- /.register-logo -->
+        <div class="card">
+            <div class="card-body register-card-body">
+                <p class="register-box-msg">Preencha os campos para se registrar</p>
+
+                <form action="{{ route('register') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+
+                    <label class="visually-hidden" for="name">Nome</label>
+                    <div class="input-group mb-3">
+                        <div class="input-group-text">
+                            <span class="bi bi-person"></span>
+                        </div>
+                        <input id="name" name="name" type="text"
+                            class="form-control @error('name') is-invalid @enderror" placeholder="Nome" value="{{ old('name') }}" />
+                        <div class="invalid-feedback">
+                            @error('name')
+                                {{ $message }}
+                            @enderror
+                        </div>
+                    </div>
+                    <label class="visually-hidden" for="email">Email</label>
+                    <div class="input-group mb-3">
+                        <div class="input-group-text">
+                            <span class="bi bi-envelope"></span>
+                        </div>
+                        <input id="email" name="email" type="email"
+                            class="form-control @error('email') is-invalid @enderror" placeholder="Email" value="{{ old('email') }}" />
+                        <div class="invalid-feedback">
+                            @error('email')
+                                {{ $message }}
+                            @enderror
+                        </div>
+                    </div>
+                    <label class="visually-hidden" for="password">Password</label>
+                    <div class="input-group mb-3">
+                        <div class="input-group-text">
+                            <span class="bi bi-lock-fill"></span>
+                        </div>
+                        <input id="password" name="password" type="password"
+                            class="form-control @error('password') is-invalid @enderror" placeholder="Password" />
+                        <div class="invalid-feedback">
+                            @error('password')
+                                {{ $message }}
+                            @enderror
+                        </div>
+                    </div>
+                    <label class="visually-hidden" for="password_confirmation">Confirm Password</label>
+                    <div class="input-group mb-3">
+                        <div class="input-group-text">
+                            <span class="bi bi-lock-fill"></span>
+                        </div>
+                        <input id="password_confirmation" name="password_confirmation" type="password"
+                            class="form-control @error('password_confirmation') is-invalid @enderror"
+                            placeholder="Confirm Password" />
+                        <div class="invalid-feedback">
+                            @error('password_confirmation')
+                                {{ $message }}
+                            @enderror
+                        </div>
+                    </div>
+
+                    <!--begin::Row-->
+                    <div class="row" flex="true" style="display: flex; justify-content: center;">
+
+                        <!-- /.col -->
+                        <div class="col-4">
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">Enviar</button>
+                            </div>
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!--end::Row-->
+                </form>
+
+
+                <!-- /.social-auth-links -->
+
+            </div>
+            <!-- /.register-card-body -->
+        </div>
+    </main>
+
+@endsection
