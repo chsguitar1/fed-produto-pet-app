@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\MarcaRequest;
 use App\Models\Marca;
+use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 
@@ -11,7 +11,7 @@ class MarcaController extends Controller
 {
     public function index()
     {
-        $lista = Marca::all()->sortBy('Marca')->values();
+        $lista = Marca::all()->sortBy('marca')->values();
 
         $porPagina = 15;
         $pagina = Paginator::resolveCurrentPage();
@@ -27,57 +27,17 @@ class MarcaController extends Controller
         return view('marcas.index', compact('marcas'));
     }
 
-    public function create()
+    public function store(Request $request)
     {
-        return view('marcas.create');
-    }
+        $dados = $request->validate([
+            'marca' => ['required', 'string', 'max:255'],
+            'fabricante' => ['required', 'string', 'max:255'],
+        ]);
 
-    public function store(MarcaRequest $request)
-    {
-        Marca::create($request->validated());
+        Marca::create($dados);
 
         return redirect()
             ->route('marcas.index')
             ->with('success', 'Marca cadastrada com sucesso!');
-    }
-
-    public function show(Marca $marca)
-    {
-        $marca->load('produtos');
-
-        return view('marcas.show', compact('marca'));
-    }
-
-    public function edit(Marca $marca)
-    {
-        return view('marcas.edit', compact('marca'));
-    }
-
-    /**
-     * Valida (MarcaRequest) e atualiza a marca.
-     */
-    public function update(MarcaRequest $request, Marca $marca)
-    {
-        $marca->update($request->validated());
-
-        return redirect()
-            ->route('marcas.index')
-            ->with('success', 'Marca atualizada com sucesso!');
-    }
-
-    /**
-     * Remove a marca, a menos que existam produtos vinculados.
-     */
-    public function destroy(Marca $marca)
-    {
-        if ($marca->produtos()->exists()) {
-            return back()->with('error', 'Esta marca possui produtos vinculados e não pode ser excluída.');
-        }
-
-        $marca->delete();
-
-        return redirect()
-            ->route('marcas.index')
-            ->with('success', 'Marca removida com sucesso!');
     }
 }
