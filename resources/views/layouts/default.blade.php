@@ -3,9 +3,9 @@
   <!--begin::Head-->
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>AdminLTE v4 | Dashboard</title>
+    <title>Petshop</title>
     @vite('resources/scss/app.scss')
-   
+
 
     <!--begin::Theme Init (prevents flash of incorrect theme on load, #6043)-->
     <script>
@@ -84,7 +84,7 @@
       onload="this.media = 'all'"
     />
     <!--end::Fonts-->
- 
+
   </head>
   <!--end::Head-->
   <!--begin::Body-->
@@ -110,7 +110,7 @@
           <div class="container-fluid">
             <!--begin::Row-->
             @yield('content')
-            
+
             <!-- /.row (main row) -->
           </div>
           <!--end::Container-->
@@ -120,8 +120,8 @@
       <!--end::App Main-->
       <!--begin::Footer-->
       @include('parts.footer')
-      
-      <!--end::Footer-->    
+
+      <!--end::Footer-->
     </div>
     <!--end::App Wrapper-->
     <!--begin::Script-->
