@@ -16,7 +16,7 @@
             <div>
                 <h2 class="card-title">Produtos cadastrados</h2>
                 <p class="small text-body-secondary mb-0 mt-1">
-                    {{ $produtos->total() }} {{ $produtos->total() === 1 ? 'produto encontrado' : 'produtos encontrados' }}
+                    {{ $produtos->count() }} {{ $produtos->count() === 1 ? 'produto encontrado' : 'produtos encontrados' }}
                 </p>
             </div>
             <a href="{{ route('produtos.create') }}" class="btn btn-primary">
@@ -66,11 +66,5 @@
                 </table>
             </div>
         </div>
-
-        @if ($produtos->hasPages())
-            <div class="card-footer">
-                {{ $produtos->links() }}
-            </div>
-        @endif
     </div>
 @endsection

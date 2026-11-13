@@ -12,9 +12,18 @@ class CategoriaController extends Controller
      */
     public function index()
     {
-        $categorias = Categoria::withCount('produtos')
-            ->orderBy('categoria')
-            ->paginate(15);
+        $lista = Categoria::all()->sortBy('categoria')->values();
+
+        $porPagina = 15;
+        $pagina = Paginator::resolveCurrentPage();
+
+        $categorias = new LengthAwarePaginator(
+            $lista->forPage($pagina, $porPagina)->values(),
+            $lista->count(),
+            $porPagina,
+            $pagina,
+            ['path' => Paginator::resolveCurrentPath()]
+        );
 
         return view('categorias.index', compact('categorias'));
     }

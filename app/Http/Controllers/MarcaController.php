@@ -4,32 +4,34 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\MarcaRequest;
 use App\Models\Marca;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 
 class MarcaController extends Controller
 {
-    /**
-     * Lista as marcas com a quantidade de produtos de cada uma.
-     */
     public function index()
     {
-        $marcas = Marca::withCount('produtos')
-            ->orderBy('marca')
-            ->paginate(15);
+        $lista = Marca::all()->sortBy('Marca')->values();
+
+        $porPagina = 15;
+        $pagina = Paginator::resolveCurrentPage();
+
+        $marcas = new LengthAwarePaginator(
+            $lista->forPage($pagina, $porPagina)->values(),
+            $lista->count(),
+            $porPagina,
+            $pagina,
+            ['path' => Paginator::resolveCurrentPath()]
+        );
 
         return view('marcas.index', compact('marcas'));
     }
 
-    /**
-     * Exibe o formulário de cadastro.
-     */
     public function create()
     {
         return view('marcas.create');
     }
 
-    /**
-     * Valida (MarcaRequest) e grava a nova marca.
-     */
     public function store(MarcaRequest $request)
     {
         Marca::create($request->validated());
@@ -39,9 +41,6 @@ class MarcaController extends Controller
             ->with('success', 'Marca cadastrada com sucesso!');
     }
 
-    /**
-     * Mostra os detalhes da marca e os produtos vinculados a ela.
-     */
     public function show(Marca $marca)
     {
         $marca->load('produtos');
@@ -49,9 +48,6 @@ class MarcaController extends Controller
         return view('marcas.show', compact('marca'));
     }
 
-    /**
-     * Exibe o formulário de edição já preenchido.
-     */
     public function edit(Marca $marca)
     {
         return view('marcas.edit', compact('marca'));

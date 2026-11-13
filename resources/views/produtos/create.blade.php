@@ -140,7 +140,7 @@
             </div>
 
             <div class="card-body product-registration__card-body p-4">
-                <form method="POST">
+                <form method="POST" action="{{ route('produtos.store') }}">
                     @csrf
 
                     <section class="product-registration__section" aria-labelledby="product-details-heading">
