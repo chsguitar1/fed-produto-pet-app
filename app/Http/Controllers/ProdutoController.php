@@ -7,48 +7,61 @@ use App\Models\Categoria;
 use App\Models\Lote;
 use App\Models\Marca;
 use App\Models\Produto;
+use Illuminate\Http\Request;
 
 class ProdutoController extends Controller
 {
-    /**
-     * Lista os produtos já com marca, categoria e lote carregados
-     * (eager loading evita o problema de N+1 consultas).
-     */
-    public function index()
-    {
-        $produtos = Produto::with(['marca', 'categoria', 'lote'])
-            ->latest()
-            ->paginate(15);
-
-        return view('produtos.index', compact('produtos'));
-    }
-
-    /**
-     * Exibe o formulário de cadastro com os dados dos selects.
-     */
     public function create()
     {
-        return view('produtos.create', $this->dadosDoFormulario());
+        return view('produtos.create', [
+            'categorias' => Categoria::all(),
+            'marcas' => Marca::all(),
+        ]);
     }
 
-    /**
-     * Valida (ProdutoRequest) e grava o produto.
-     *
-     * $request->dados() aplica a regra de negócio: se a categoria
-     * não controla estoque (serviço), quantidade vira 0 e lote_id vira null.
-     */
-    public function store(ProdutoRequest $request)
+    public function store(Request $request)
     {
-        Produto::create($request->dados());
+        $dados = $request->validate([
+            'categoria_id' => ['required', 'exists:categorias,id'],
+            'marca_id' => ['required', 'exists:marcas,id'],
+            'produto' => ['required', 'string', 'max:255'],
+            'quantidade' => ['required', 'integer', 'min:0'],
+            'preco_custo' => ['required', 'numeric', 'min:0'],
+            'preco_venda' => ['required', 'numeric', 'min:0'],
+            'lote' => ['required', 'string', 'max:255'],
+            'data_fabricacao' => ['required', 'date'],
+            'data_validade' => ['nullable', 'date', 'after_or_equal:data_fabricacao'],
+        ]);
+
+        // find: só categorias alimentícias guardam validade
+        $categoria = Categoria::find($dados['categoria_id']);
+        $dataValidade = stripos($categoria->categoria, 'aliment') !== false
+            ? ($dados['data_validade'] ?? null)
+            : null;
+
+        // 1º grava o lote (tabela separada) com fabricação e validade
+        $lote = Lote::create([
+            'numero_lote' => $dados['lote'],
+            'data_fabricacao' => $dados['data_fabricacao'],
+            'data_validade' => $dataValidade,
+        ]);
+
+        // 2º grava o produto guardando só o id do lote
+        Produto::create([
+            'categoria_id' => $dados['categoria_id'],
+            'marca_id' => $dados['marca_id'],
+            'lote_id' => $lote->id,
+            'produto' => $dados['produto'],
+            'quantidade' => $dados['quantidade'],
+            'preco_custo' => $dados['preco_custo'],
+            'preco_venda' => $dados['preco_venda'],
+        ]);
 
         return redirect()
-            ->route('produtos.index')
+            ->route('home')
             ->with('success', 'Produto cadastrado com sucesso!');
     }
 
-    /**
-     * Mostra os detalhes de um produto com seus relacionamentos.
-     */
     public function show(Produto $produto)
     {
         $produto->load(['marca', 'categoria', 'lote']);

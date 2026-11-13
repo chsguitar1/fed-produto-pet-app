@@ -2,86 +2,42 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\MarcaRequest;
 use App\Models\Marca;
+use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 
 class MarcaController extends Controller
 {
-    /**
-     * Lista as marcas com a quantidade de produtos de cada uma.
-     */
     public function index()
     {
-        $marcas = Marca::withCount('produtos')
-            ->orderBy('marca')
-            ->paginate(15);
+        $lista = Marca::all()->sortBy('marca')->values();
+
+        $porPagina = 15;
+        $pagina = Paginator::resolveCurrentPage();
+
+        $marcas = new LengthAwarePaginator(
+            $lista->forPage($pagina, $porPagina)->values(),
+            $lista->count(),
+            $porPagina,
+            $pagina,
+            ['path' => Paginator::resolveCurrentPath()]
+        );
 
         return view('marcas.index', compact('marcas'));
     }
 
-    /**
-     * Exibe o formulário de cadastro.
-     */
-    public function create()
+    public function store(Request $request)
     {
-        return view('marcas.create');
-    }
+        $dados = $request->validate([
+            'marca' => ['required', 'string', 'max:255'],
+            'fabricante' => ['required', 'string', 'max:255'],
+        ]);
 
-    /**
-     * Valida (MarcaRequest) e grava a nova marca.
-     */
-    public function store(MarcaRequest $request)
-    {
-        Marca::create($request->validated());
+        Marca::create($dados);
 
         return redirect()
             ->route('marcas.index')
             ->with('success', 'Marca cadastrada com sucesso!');
-    }
-
-    /**
-     * Mostra os detalhes da marca e os produtos vinculados a ela.
-     */
-    public function show(Marca $marca)
-    {
-        $marca->load('produtos');
-
-        return view('marcas.show', compact('marca'));
-    }
-
-    /**
-     * Exibe o formulário de edição já preenchido.
-     */
-    public function edit(Marca $marca)
-    {
-        return view('marcas.edit', compact('marca'));
-    }
-
-    /**
-     * Valida (MarcaRequest) e atualiza a marca.
-     */
-    public function update(MarcaRequest $request, Marca $marca)
-    {
-        $marca->update($request->validated());
-
-        return redirect()
-            ->route('marcas.index')
-            ->with('success', 'Marca atualizada com sucesso!');
-    }
-
-    /**
-     * Remove a marca, a menos que existam produtos vinculados.
-     */
-    public function destroy(Marca $marca)
-    {
-        if ($marca->produtos()->exists()) {
-            return back()->with('error', 'Esta marca possui produtos vinculados e não pode ser excluída.');
-        }
-
-        $marca->delete();
-
-        return redirect()
-            ->route('marcas.index')
-            ->with('success', 'Marca removida com sucesso!');
     }
 }
