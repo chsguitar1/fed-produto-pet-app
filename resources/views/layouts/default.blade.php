@@ -1,46 +1,31 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-br" data-bs-theme="dark">
   <!--begin::Head-->
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Petshop</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    <title>@yield('title', 'PetShop') - Sistema de Gestão</title>
+
     @vite('resources/scss/app.scss')
 
-
-    <!--begin::Theme Init (prevents flash of incorrect theme on load, #6043)-->
+    <!--begin::Theme Init (Default Dark Theme)-->
     <script>
       (() => {
         'use strict';
         const root = document.documentElement;
 
-        // Applications with their own theming opt out of AdminLTE's color mode
-        // entirely, here as well as in the bundle.
-        if (root.getAttribute('data-lte-color-mode') === 'off') {
-          return;
-        }
-
         const STORAGE_KEY = 'lte-theme';
         let stored = null;
         try {
           stored = localStorage.getItem(STORAGE_KEY);
-        } catch {
-          // localStorage may be unavailable (private mode, sandboxed iframe).
-        }
-        // Mirror the precedence in color-mode.ts: the visitor's stored choice
-        // wins, then a theme this page declared itself, then the OS preference.
+        } catch {}
+
+        // Precedence: stored choice > authored theme > 'dark' default
         const authored = root.getAttribute('data-bs-theme');
-        let resolved = 'light';
-        if (stored === 'dark' || stored === 'light') {
-          resolved = stored;
-        } else if (authored === 'dark' || authored === 'light') {
-          resolved = authored;
-        } else if (globalThis.matchMedia('(prefers-color-scheme: dark)').matches) {
-          resolved = 'dark';
-        }
+        let resolved = stored || authored || 'dark';
+
         root.setAttribute('data-bs-theme', resolved);
         root.style.colorScheme = resolved;
-        // Flag values computed here, so the bundle does not mistake them for a
-        // theme the page declared and stop following the OS preference.
         if (resolved !== authored) {
           root.setAttribute('data-lte-theme-resolved', '');
         }
@@ -48,33 +33,13 @@
     </script>
     <!--end::Theme Init-->
 
-    <!--begin::Accessibility Meta Tags-->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-    <meta name="color-scheme" content="light dark" />
-    <meta name="theme-color" content="#007bff" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
-    <!--end::Accessibility Meta Tags-->
+    <!--begin::Meta Tags-->
+    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#1a1d20" />
+    <meta name="description" content="PetShop - Sistema de Gestão de Produtos, Categorias e Marcas" />
+    <!--end::Meta Tags-->
 
-    <!--begin::Primary Meta Tags-->
-    <meta name="title" content="AdminLTE v4 | Dashboard" />
-    <meta name="author" content="ColorlibHQ" />
-    <meta
-      name="description"
-      content="AdminLTE is a free Bootstrap 5 admin dashboard template with almost 50 example pages, built with vanilla JS and designed with accessibility in mind."
-    />
-    <meta
-      name="keywords"
-      content="bootstrap 5, bootstrap, bootstrap 5 admin dashboard, bootstrap 5 dashboard, bootstrap 5 charts, bootstrap 5 calendar, bootstrap 5 datepicker, bootstrap 5 tables, bootstrap 5 datatable, vanilla js datatable, colorlibhq, colorlibhq dashboard, colorlibhq admin dashboard, accessible admin panel"
-    />
-    <!--end::Primary Meta Tags-->
-
-    <!--begin::Accessibility Features-->
-    <!-- Skip links will be dynamically added by accessibility.js -->
-    <meta name="supported-color-schemes" content="light dark" />
-    <link rel="preload" href="./css/adminlte.css" as="style" />
-    <!--end::Accessibility Features-->
-
-    <!--begin::Fonts-->
+    <!--begin::Fonts & Icons-->
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css"
@@ -83,328 +48,124 @@
       media="print"
       onload="this.media = 'all'"
     />
-    <!--end::Fonts-->
+    <!-- FontAwesome 6 -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+      integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <!-- Bootstrap Icons (fallback compatibility) -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+      crossorigin="anonymous"
+    />
+    <!--end::Fonts & Icons-->
 
+    @stack('styles')
   </head>
   <!--end::Head-->
+
   <!--begin::Body-->
   <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
-     @vite('resources/js/app.js')
+    @vite('resources/js/app.js')
+
     <!--begin::App Wrapper-->
     <div class="app-wrapper">
       <!--begin::Header-->
       @include('parts.header')
       <!--end::Header-->
+
       <!--begin::Sidebar-->
       @include('parts.sidebar')
       <!--end::Sidebar-->
+
       <!--begin::App Main-->
       <main class="app-main">
         <!--begin::App Content Header-->
-
         @include('parts.content-header')
         <!--end::App Content Header-->
+
         <!--begin::App Content-->
         <div class="app-content">
-          <!--begin::Container-->
           <div class="container-fluid">
-            <!--begin::Row-->
             @yield('content')
-
-            <!-- /.row (main row) -->
           </div>
-          <!--end::Container-->
         </div>
         <!--end::App Content-->
       </main>
       <!--end::App Main-->
+
       <!--begin::Footer-->
       @include('parts.footer')
-
       <!--end::Footer-->
     </div>
     <!--end::App Wrapper-->
-    <!--begin::Script-->
-    <!--begin::Third Party Plugin(OverlayScrollbars)-->
+
+    <!--begin::Third Party Scripts-->
     <script
       src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js"
       crossorigin="anonymous"
     ></script>
-    <!--end::Third Party Plugin(OverlayScrollbars)--><!--begin::Required Plugin(popperjs for Bootstrap 5)-->
     <script
       src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
       crossorigin="anonymous"
     ></script>
-    <!--end::Required Plugin(popperjs for Bootstrap 5)--><!--begin::Required Plugin(Bootstrap 5)-->
     <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js"
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
       crossorigin="anonymous"
     ></script>
-    <!--end::Required Plugin(Bootstrap 5)--><!--begin::Required Plugin(AdminLTE)-->
-    <script src="./js/adminlte.js"></script>
-    <!--end::Required Plugin(AdminLTE)-->
-    <!--begin::OverlayScrollbars Configure-->
-    <script>
-      const SELECTOR_SIDEBAR_WRAPPER = '.sidebar-wrapper';
-      const Default = {
-        scrollbarTheme: 'os-theme-light',
-        scrollbarAutoHide: 'leave',
-        scrollbarClickScroll: true,
-      };
-      document.addEventListener('DOMContentLoaded', function () {
-        const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
+    <!--end::Third Party Scripts-->
 
-        // Disable OverlayScrollbars on mobile devices to prevent touch interference
+    <!--begin::OverlayScrollbars & Theme Toggle Script-->
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const SELECTOR_SIDEBAR_WRAPPER = '.sidebar-wrapper';
+        const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
         const isMobile = window.innerWidth <= 992;
 
         if (
           sidebarWrapper &&
+          typeof OverlayScrollbarsGlobal !== 'undefined' &&
           OverlayScrollbarsGlobal?.OverlayScrollbars !== undefined &&
           !isMobile
         ) {
           OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
             scrollbars: {
-              theme: Default.scrollbarTheme,
-              autoHide: Default.scrollbarAutoHide,
-              clickScroll: Default.scrollbarClickScroll,
+              theme: 'os-theme-light',
+              autoHide: 'leave',
+              clickScroll: true,
             },
           });
         }
-      });
-    </script>
-    <!--end::OverlayScrollbars Configure-->
-    <!--begin::Charts follow the colour mode-->
-    <script>
-      // ApexCharts draws light-theme tooltips and axis text unless told otherwise,
-      // which is unreadable in dark mode (#6105). Give it the page's colour mode as
-      // a global default before any chart is created — this runs before the chart
-      // pages' own scripts — and keep every chart that has a `chart.id` in step
-      // when the mode changes (ColorMode, the OS in auto mode, or your own code).
-      (() => {
-        'use strict';
-        const mode = () =>
-          document.documentElement.getAttribute('data-bs-theme') === 'dark' ? 'dark' : 'light';
-        // `Apex` is ApexCharts' global-options object; it must exist before the library loads.
-        // theme.mode also sets a dark chart background — keep the card's instead.
-        // eslint-disable-next-line unicorn/no-global-object-property-assignment
-        globalThis.Apex ||= {};
-        const apex = globalThis.Apex;
-        apex.theme = { mode: mode() };
-        apex.chart = Object.assign(apex.chart || {}, { background: 'transparent' });
-        new MutationObserver(() => {
-          const next = mode();
-          apex.theme = { mode: next };
-          const instances = apex._chartInstances || [];
-          for (const { chart } of instances) {
-            chart.updateOptions({ theme: { mode: next } }, false, false);
-          }
-        }).observe(document.documentElement, {
-          attributes: true,
-          attributeFilter: ['data-bs-theme'],
+
+        // Theme Toggle Handler
+        const themeButtons = document.querySelectorAll('[data-bs-theme-value]');
+        themeButtons.forEach(button => {
+          button.addEventListener('click', () => {
+            const theme = button.getAttribute('data-bs-theme-value');
+            localStorage.setItem('lte-theme', theme);
+            document.documentElement.setAttribute('data-bs-theme', theme);
+            document.documentElement.style.colorScheme = theme;
+
+            themeButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            const currentIcon = document.querySelector('#bd-theme-icon');
+            if (currentIcon) {
+              currentIcon.className = theme === 'dark' 
+                ? 'fa-solid fa-moon' 
+                : (theme === 'light' ? 'fa-solid fa-sun' : 'fa-solid fa-circle-half-stroke');
+            }
+          });
         });
-      })();
-    </script>
-    <!--end::Charts follow the colour mode-->
-
-    <!--begin::Color Mode Toggle-->
-    <!-- The light/dark/auto switcher ships in adminlte.js as the ColorMode
-     module (since 4.1) — no page script needed. Only the no-flash snippet
-     in <head> stays inline, because it must run before first paint. -->
-    <!--end::Color Mode Toggle-->
-
-    <!-- OPTIONAL SCRIPTS -->
-
-    <!-- sortablejs -->
-    <script
-      src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"
-      crossorigin="anonymous"
-    ></script>
-    <!-- sortablejs -->
-    <script>
-      new Sortable(document.querySelector('.connectedSortable'), {
-        group: 'shared',
-        handle: '.card-header',
-      });
-
-      const cardHeaders = document.querySelectorAll('.connectedSortable .card-header');
-      cardHeaders.forEach((cardHeader) => {
-        cardHeader.style.cursor = 'move';
       });
     </script>
-    <!-- apexcharts -->
-    <script
-      src="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1/dist/apexcharts.min.js"
-      integrity="sha256-+vh8GkaU7C9/wbSLIcwq82tQ2wTf44aOHA8HlBMwRI8="
-      crossorigin="anonymous"
-    ></script>
-    <!-- ChartJS -->
-    <script>
-      // NOTICE!! DO NOT USE ANY OF THIS JAVASCRIPT
-      // IT'S ALL JUST JUNK FOR DEMO
-      // ++++++++++++++++++++++++++++++++++++++++++
+    <!--end::OverlayScrollbars & Theme Toggle Script-->
 
-      const sales_chart_options = {
-        series: [
-          {
-            name: 'Digital Goods',
-            data: [28, 48, 40, 19, 86, 27, 90],
-          },
-          {
-            name: 'Electronics',
-            data: [65, 59, 80, 81, 56, 55, 40],
-          },
-        ],
-        chart: {
-          id: 'revenue-chart',
-          height: 300,
-          type: 'area',
-          toolbar: {
-            show: false,
-          },
-        },
-        legend: {
-          show: false,
-        },
-        colors: ['#0d6efd', '#20c997'],
-        dataLabels: {
-          enabled: false,
-        },
-        stroke: {
-          curve: 'smooth',
-        },
-        xaxis: {
-          type: 'datetime',
-          categories: [
-            '2023-01-01',
-            '2023-02-01',
-            '2023-03-01',
-            '2023-04-01',
-            '2023-05-01',
-            '2023-06-01',
-            '2023-07-01',
-          ],
-        },
-        tooltip: {
-          x: {
-            format: 'MMMM yyyy',
-          },
-        },
-      };
-
-      const sales_chart = new ApexCharts(
-        document.querySelector('#revenue-chart'),
-        sales_chart_options,
-      );
-      sales_chart.render();
-    </script>
-    <!-- jsvectormap -->
-    <script
-      src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/js/jsvectormap.min.js"
-      integrity="sha256-/t1nN2956BT869E6H4V1dnt0X5pAQHPytli+1nTZm2Y="
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/maps/world.js"
-      integrity="sha256-XPpPaZlU8S/HWf7FZLAncLg2SAkP8ScUTII89x9D3lY="
-      crossorigin="anonymous"
-    ></script>
-    <!-- jsvectormap -->
-    <script>
-      // World map by jsVectorMap
-      new jsVectorMap({
-        selector: '#world-map',
-        map: 'world',
-      });
-
-      // Sparkline charts
-      const option_sparkline1 = {
-        series: [
-          {
-            data: [1000, 1200, 920, 927, 931, 1027, 819, 930, 1021],
-          },
-        ],
-        chart: {
-          id: 'sparkline-1',
-          type: 'area',
-          height: 50,
-          sparkline: {
-            enabled: true,
-          },
-        },
-        stroke: {
-          curve: 'straight',
-        },
-        fill: {
-          opacity: 0.3,
-        },
-        yaxis: {
-          min: 0,
-        },
-        colors: ['#DCE6EC'],
-      };
-
-      const sparkline1 = new ApexCharts(document.querySelector('#sparkline-1'), option_sparkline1);
-      sparkline1.render();
-
-      const option_sparkline2 = {
-        series: [
-          {
-            data: [515, 519, 520, 522, 652, 810, 370, 627, 319, 630, 921],
-          },
-        ],
-        chart: {
-          id: 'sparkline-2',
-          type: 'area',
-          height: 50,
-          sparkline: {
-            enabled: true,
-          },
-        },
-        stroke: {
-          curve: 'straight',
-        },
-        fill: {
-          opacity: 0.3,
-        },
-        yaxis: {
-          min: 0,
-        },
-        colors: ['#DCE6EC'],
-      };
-
-      const sparkline2 = new ApexCharts(document.querySelector('#sparkline-2'), option_sparkline2);
-      sparkline2.render();
-
-      const option_sparkline3 = {
-        series: [
-          {
-            data: [15, 19, 20, 22, 33, 27, 31, 27, 19, 30, 21],
-          },
-        ],
-        chart: {
-          id: 'sparkline-3',
-          type: 'area',
-          height: 50,
-          sparkline: {
-            enabled: true,
-          },
-        },
-        stroke: {
-          curve: 'straight',
-        },
-        fill: {
-          opacity: 0.3,
-        },
-        yaxis: {
-          min: 0,
-        },
-        colors: ['#DCE6EC'],
-      };
-
-      const sparkline3 = new ApexCharts(document.querySelector('#sparkline-3'), option_sparkline3);
-      sparkline3.render();
-    </script>
-    <!--end::Script-->
+    @stack('scripts')
   </body>
   <!--end::Body-->
 </html>
